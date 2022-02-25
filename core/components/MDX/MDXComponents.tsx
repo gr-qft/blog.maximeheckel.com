@@ -57,6 +57,37 @@ const VaporwaveThreejsDisclaimer = dynamic(
   () => import('./Widgets/VaporwaveThreejs/CalloutGPUTier')
 );
 
+const FramerMotionLayoutAnimationsBasic = dynamic(
+  () => import('./Widgets/FramerMotionLayoutAnimations/Basic')
+);
+
+const FramerMotionLayoutAnimationsLayoutProp = dynamic(
+  () => import('./Widgets/FramerMotionLayoutAnimations/LayoutProp')
+);
+
+const FramerMotionLayoutAnimationsLayoutPosition = dynamic(
+  () => import('./Widgets/FramerMotionLayoutAnimations/LayoutPosition')
+);
+
+const FramerMotionLayoutAnimationsSharedLayoutAnimationDetails = dynamic(
+  () =>
+    import(
+      './Widgets/FramerMotionLayoutAnimations/SharedLayoutAnimationDetails'
+    )
+);
+
+const FramerMotionLayoutAnimationsTabsLayoutGroup = dynamic(
+  () => import('./Widgets/FramerMotionLayoutAnimations/TabsLayoutGroup')
+);
+
+const FramerMotionToastNotificationSandpack = dynamic(
+  () => import('./Widgets/FramerMotionLayoutAnimations/SandpackNotification')
+);
+
+const FramerMotionTabsSandpack = dynamic(
+  () => import('./Widgets/FramerMotionLayoutAnimations/SandpackTabs')
+);
+
 const customComponents = {
   AnimationTypes,
   ClipboardAnimationDetails,
@@ -77,8 +108,15 @@ const customComponents = {
   OpenAIPlayground,
   CubicBezierVisualizer,
   BezierCurve,
-  // Sandpacks
   VaporwaveThreejsDisclaimer,
+  FramerMotionLayoutAnimationsBasic,
+  FramerMotionLayoutAnimationsLayoutProp,
+  FramerMotionLayoutAnimationsLayoutPosition,
+  FramerMotionLayoutAnimationsSharedLayoutAnimationDetails,
+  FramerMotionLayoutAnimationsTabsLayoutGroup,
+  // Sandpacks
+  FramerMotionToastNotificationSandpack,
+  FramerMotionTabsSandpack,
   VaporwaveThreejsSandpacks,
 };
 

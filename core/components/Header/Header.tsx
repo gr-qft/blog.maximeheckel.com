@@ -44,7 +44,7 @@ const Header = (props: HeaderProps) => {
   const readingProgress = useProgress();
 
   useKeyboardShortcut('Escape', () => setShowSearch(false));
-  useKeyboardShortcut('ctrl+k|meta+k', () => setShowSearch(true));
+  // useKeyboardShortcut('ctrl+k|meta+k', () => setShowSearch(true));
 
   return (
     <>

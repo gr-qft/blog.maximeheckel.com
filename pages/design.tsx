@@ -46,7 +46,7 @@ import Text, {
   Strong,
 } from '@theme/components/Typography';
 import Layout from '@theme/layout';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, LayoutGroup, motion, Reorder } from 'framer-motion';
 import { styled, css } from 'lib/stitches.config';
 import { getTweets } from 'lib/tweets';
 import dynamic from 'next/dynamic';
@@ -99,6 +99,506 @@ export default function App() {
   return <WavingHand/>;
 }
 `;
+
+const TestFramerLayoutSize = () => {
+  const [c, setC] = React.useState(true);
+
+  // layout false => no transition / new size + new position
+  // layout true => size + position
+  // layout position => just the position / new size instantly
+  // layout size => just the size / moves to position instantly
+
+  return (
+    <Grid columns={3} gap={5}>
+      <Card depth={3} title="layout={true}" css={{}}>
+        <Card.Body
+          dotMatrix
+          css={{
+            height: '300px',
+            display: 'grid',
+          }}
+        >
+          {/* <motion.div layout> */}
+          <Box
+            as={motion.div}
+            layout
+            transition={{
+              layout: {
+                duration: 1.5,
+              },
+            }}
+            css={{
+              justifySelf: c ? 'center' : 'flex-start', // c ? 20 : 10,
+              alignSelf: c ? 'center' : 'flex-start',
+              backgroundColor: 'hsla(var(--palette-gray-50), 50%)',
+              width: c ? '20px' : '100%',
+              height: c ? '20px' : '100%',
+
+              // width: c ? '100%' : '100px',
+              // height: c ? '100%' : '100px',
+            }}
+            style={{
+              borderRadius: 20, // necessary to fix distortion /!\ does not work with CSS variable
+            }}
+          />
+          {/* </motion.div> */}
+        </Card.Body>
+      </Card>
+      <Card depth={3} title="layout='position'">
+        <Card.Body dotMatrix css={{ height: '300px', display: 'grid' }}>
+          {/* <motion.div layout> */}
+          <Box
+            as={motion.div}
+            layout="position"
+            transition={{
+              layout: {
+                duration: 1.5,
+              },
+            }}
+            css={{
+              justifySelf: c ? 'center' : 'flex-start', // c ? 20 : 10,
+              alignSelf: c ? 'center' : 'flex-start',
+              backgroundColor: 'hsla(var(--palette-gray-50), 50%)',
+              width: c ? '20px' : '100%',
+              height: c ? '20px' : '100%',
+              borderRadius: 'var(--border-radius-2)',
+              // width: c ? '100%' : '100px',
+              // height: c ? '100%' : '100px',
+            }}
+            style={{
+              borderRadius: 20,
+            }}
+          />
+          {/* </motion.div> */}
+        </Card.Body>
+      </Card>
+      <Card depth={3} title="layout='size'">
+        <Card.Body dotMatrix css={{ height: '300px', display: 'grid' }}>
+          {/* <motion.div layout> */}
+          <Box
+            as={motion.div}
+            layout="size"
+            transition={{
+              layout: {
+                duration: 1.5,
+              },
+            }}
+            css={{
+              justifySelf: c ? 'center' : 'flex-start', // c ? 20 : 10,
+              alignSelf: c ? 'center' : 'flex-start',
+              backgroundColor: 'hsla(var(--palette-gray-50), 50%)',
+              width: c ? '20px' : '100%',
+              height: c ? '20px' : '100%',
+              borderRadius: 'var(--border-radius-2)',
+              // width: c ? '100%' : '100px',
+              // height: c ? '100%' : '100px',
+            }}
+            style={{
+              borderRadius: 20,
+            }}
+          />
+          {/* </motion.div> */}
+        </Card.Body>
+      </Card>
+      <Flex justifyContent="center" css={{ gridColumn: 'span 3' }}>
+        <Switch
+          aria-label="Expand card"
+          id="expand-card"
+          label="Expand card"
+          onChange={() => setC((prev) => !prev)}
+        />
+      </Flex>
+    </Grid>
+  );
+};
+
+const TestFramerLayoutGroup = () => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <Card as={motion.div} layout onClick={() => setIsOpen((prev) => !prev)}>
+      <Card.Body>
+        <motion.h2 layout>Title</motion.h2>
+        {isOpen ? <span>Some text</span> : null}
+      </Card.Body>
+    </Card>
+  );
+};
+
+const ITEMS = [
+  {
+    text: 'Finish blog post ✍️',
+    checked: false,
+    id: 1,
+  },
+  {
+    text: 'Build new Three.js experiences ✨',
+    checked: false,
+    id: 2,
+  },
+  {
+    text: 'Add new components to Design System 🌈',
+    checked: false,
+    id: 3,
+  },
+  {
+    text: 'Make some coffee ☕️',
+    checked: false,
+    id: 4,
+  },
+  {
+    text: 'Drink water 💧',
+    checked: false,
+    id: 5,
+  },
+  {
+    text: 'Go to the gym 🏃‍♂️',
+    checked: false,
+    id: 6,
+  },
+];
+
+const XIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+);
+
+const TestFramerReorder = () => {
+  const [items, setItems] = React.useState(ITEMS);
+
+  const completeItem = (id: number) => {
+    const updatedItems = items.map((item) => {
+      if (item.id === id) {
+        const updatedItem = {
+          ...item,
+          checked: !item.checked,
+        };
+
+        return updatedItem;
+      }
+
+      return item;
+    });
+
+    setItems(updatedItems);
+  };
+
+  return (
+    <Box>
+      <Flex direction="column" gap="4" alignItems="start">
+        <Flex gap={4}>
+          <Button
+            variant="secondary"
+            disabled={items.length >= 5}
+            onClick={() =>
+              setItems((prev) => {
+                return [
+                  ...prev,
+                  {
+                    text: 'Prepare for space travel 🧑‍🚀',
+                    id: Math.random(),
+                    checked: false,
+                  },
+                ];
+              })
+            }
+          >
+            Add item
+          </Button>
+          <Tooltip id="tooltip-reset-list" tooltipText="Reset task list">
+            <Button
+              variant="icon"
+              onClick={() => setItems(ITEMS)}
+              icon={<RepeatIcon />}
+            />
+          </Tooltip>
+        </Flex>
+        <LayoutGroup>
+          <Reorder.Group
+            axis="y"
+            values={items}
+            onReorder={setItems}
+            className={css({
+              display: 'flex',
+              flexDirection: 'column',
+              margin: '0',
+              padding: '0',
+              width: '100%',
+            })()}
+          >
+            <AnimatePresence initial={false}>
+              {items.map((item) => (
+                <Flex
+                  alignItems="center"
+                  justifyContent="space-between"
+                  as={motion.div}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                  key={item.id}
+                  gap="6"
+                >
+                  <Card
+                    as={Reorder.Item}
+                    css={{
+                      listStyle: 'none',
+                      marginBottom: 'var(--space-3)',
+                      cursor: 'grab',
+                      height: '100%',
+                      flexGrow: 1,
+                    }}
+                    style={{
+                      position: 'relative', // /!\ this is needed to avoid weird overlap
+                      borderRadius: '12px',
+                      width: item.checked ? '70%' : '100%', // layout resize animation
+                    }}
+                    depth={1}
+                    value={item}
+                  >
+                    <Card.Body
+                      as={motion.div}
+                      layout="position"
+                      css={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-4)',
+                        padding: 'var(--space-4)',
+                      }}
+                    >
+                      <motion.div layout>
+                        <Checkbox
+                          id={`checkbox-${item.id}`}
+                          aria-label="Mark as done"
+                          checked={item.checked}
+                          onChange={() => completeItem(item.id)}
+                        />
+                      </motion.div>
+                      <Text
+                        size="2"
+                        css={{
+                          marginBottom: 0,
+                        }}
+                      >
+                        {item.text}
+                      </Text>
+                    </Card.Body>
+                  </Card>
+                  <AnimatePresence initial={false}>
+                    {item.checked ? (
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, transition: { delay: 0.2 } }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <Button
+                          variant="icon"
+                          icon={<XIcon />}
+                          onClick={() =>
+                            setItems((prev) =>
+                              prev.filter((task) => task.id !== item.id)
+                            )
+                          }
+                        />
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </Flex>
+              ))}
+            </AnimatePresence>
+          </Reorder.Group>
+
+          <motion.div layout>
+            <HR />
+            <Text>Check items off the list when you're done!</Text>
+          </motion.div>
+        </LayoutGroup>
+      </Flex>
+    </Box>
+  );
+};
+
+// const Foo = () => (
+//   <Box
+//     css={{
+//       // maxWidth: '488px',
+//       display: 'block',
+//     }}
+//   >
+//     <Reorder.Group
+//       axis="x"
+//       values={items2}
+//       onReorder={setItems2}
+//       className={css({
+//         margin: '0',
+//         padding: '0',
+//         position: 'relative',
+//         display: 'flex',
+//         width: '100%',
+//         gap: 'var(--space-3)',
+//         flexGrow: 1,
+//       })()}
+//     >
+//       <AnimatePresence initial={false}>
+//         {items2.map((item) => (
+//           <Card
+//             as={Reorder.Item}
+//             key={item}
+//             value={item}
+//             depth={2}
+//             initial={{ opacity: 1 }}
+//             exit={{ opacity: 0 }}
+//             css={{
+//               display: 'flex',
+//               width: '100%',
+//               background: 'var(--maximeheckel-colors-emphasis)',
+//               backdropFilter: 'blur(12px)',
+//             }}
+//           >
+//             {/* layout="position" is key here to make things not squished  */}
+//             <Card.Body
+//               as={motion.div}
+//               css={{
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 justifyContent: 'space-between',
+//                 width: '100%',
+//               }}
+//               layout="position" // /!\ why position here? technically the size of this element changes
+//               // but we don't care about its size transition: it's not visible to us, we want it to
+//               // instantly grow to its target so we do not see it's content being "squished" first
+//             >
+//               <Text
+//                 family="numeric"
+//                 css={{
+//                   marginBottom: 0,
+//                 }}
+//               >
+//                 {item}
+//               </Text>
+//               <motion.div layout>
+//                 <Button
+//                   variant="icon"
+//                   icon={<AlertIcon />}
+//                   onClick={() =>
+//                     setItems2((prev) =>
+//                       prev.filter((thingy) => thingy !== item)
+//                     )
+//                   }
+//                 />
+//               </motion.div>
+//             </Card.Body>
+//           </Card>
+//         ))}
+//       </AnimatePresence>
+//     </Reorder.Group>
+//   </Box>
+// );
+
+const Wrapper = styled('ul', {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '8px 16px',
+  background: '#1A1D23',
+  borderRadius: '8px',
+  width: 'fit-content',
+  border: '1px solid #2B303B',
+  gap: '32px',
+});
+
+const Tab = styled('li', {
+  position: 'relative',
+  listStyle: 'none',
+  cursor: 'pointer',
+  width: '50px',
+  height: '30px',
+  outline: 'none',
+
+  span: {
+    position: 'absolute',
+    left: '2px',
+    right: 0,
+    top: '3px',
+    bottom: 0,
+    zIndex: 1,
+    userSelect: 'none',
+    fontSize: '0.875rem',
+  },
+});
+
+const TabsSharedLayoutAnimation = () => {
+  const [focused, setFocused] = React.useState<string | null>(null);
+  const [selected, setSelected] = React.useState('Item 1');
+  const tabs = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
+
+  return (
+    <Wrapper onMouseLeave={() => setFocused(null)}>
+      {tabs.map((item) => (
+        <Tab
+          key={item}
+          onClick={() => setSelected(item)}
+          onKeyDown={(event: { key: string }) =>
+            event.key === 'Enter' ? setSelected(item) : null
+          }
+          onFocus={() => setFocused(item)}
+          onMouseEnter={() => setFocused(item)}
+          tabIndex={0}
+        >
+          <span>{item}</span>
+          {focused === item ? (
+            <motion.div
+              transition={{
+                layout: {
+                  duration: 0.2,
+                  ease: 'easeOut',
+                },
+              }}
+              style={{
+                position: 'absolute',
+                bottom: '-2px',
+                left: '-10px',
+                right: 0,
+                width: '140%',
+                height: '110%',
+                background: 'var(--maximeheckel-colors-foreground)',
+                borderRadius: '8px',
+                zIndex: 0,
+              }}
+              layoutId="highlight"
+            />
+          ) : null}
+          {selected === item ? (
+            <motion.div
+              style={{
+                position: 'absolute',
+                bottom: '-10px',
+                left: '0px',
+                right: 0,
+                height: '4px',
+                background: '#5686F5',
+                borderRadius: '8px',
+                zIndex: 0,
+              }}
+              layoutId="underline"
+            />
+          ) : null}
+        </Tab>
+      ))}
+    </Wrapper>
+  );
+};
 
 /**
  * TODO:
@@ -170,6 +670,36 @@ export default function Design(props: {
           </Flex>
         </Box>
         <Box as="section" className={gridItem()}>
+          <LayoutGroup id="1" inheritId>
+            <TabsSharedLayoutAnimation />
+          </LayoutGroup>
+          {/* <LayoutGroup id="2">
+            <TabsSharedLayoutAnimation />
+          </LayoutGroup> */}
+          <br />
+          <br />
+          <TestFramerLayoutSize />
+          <br />
+          <br />
+          {/* Make all distinct layout animations behave smoothly */}
+          {/* Also: Namespace reusable shared animations with a given layout id*/}
+          {/* https://www.framer.com/docs/layout-group/#namespace-layoutid */}
+          <LayoutGroup>
+            <br />
+            <TestFramerLayoutGroup />
+            <TestFramerLayoutGroup />
+
+            <br />
+            <br />
+            <TestFramerReorder />
+          </LayoutGroup>
+        </Box>
+
+        <Box as="section" className={gridItem()}>
+          <br />
+          <br />
+          <br />
+          <br />
           <H2>Name (WIP)</H2>
           <Text family="numeric" size="4">
             3X-DS (Explore, Expand, Experiment)
